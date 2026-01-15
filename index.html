@@ -1,0 +1,76 @@
+<script>
+let stations = [];
+let index = 0;
+
+const player = document.getElementById("player");
+const viz = document.getElementById("viz");
+const listDiv = document.getElementById("stationList");
+
+fetch("stations.json")
+  .then(res => res.json())
+  .then(data => {
+    stations = data;
+    loadStation();
+    renderStationList();
+  });
+
+function loadStation() {
+  document.getElementById("stationName").innerText = stations[index].name;
+  document.getElementById("stationAm").innerText = stations[index].am;
+  document.getElementById("logo").src = stations[index].logo;
+  player.src = stations[index].url;
+  highlightActive();
+}
+
+function playRadio() {
+  player.play();
+  viz.style.display = "block";
+}
+
+function stopRadio() {
+  player.pause();
+  viz.style.display = "none";
+}
+
+function nextStation() {
+  index = (index + 1) % stations.length;
+  loadStation();
+  playRadio();
+}
+
+function prevStation() {
+  index = (index - 1 + stations.length) % stations.length;
+  loadStation();
+  playRadio();
+}
+
+function setVolume(v) {
+  player.volume = v;
+}
+
+function toggleTheme() {
+  document.body.classList.toggle("light");
+}
+
+/* Station List */
+function renderStationList() {
+  listDiv.innerHTML = "";
+  stations.forEach((s, i) => {
+    const div = document.createElement("div");
+    div.className = "station-item";
+    div.innerText = s.name;
+    div.onclick = () => {
+      index = i;
+      loadStation();
+      playRadio();
+    };
+    listDiv.appendChild(div);
+  });
+}
+
+function highlightActive() {
+  document.querySelectorAll(".station-item").forEach((el, i) => {
+    el.classList.toggle("active", i === index);
+  });
+}
+</script>
